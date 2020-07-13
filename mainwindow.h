@@ -14,6 +14,7 @@ class MainWindow : public QMainWindow
     Q_OBJECT
 
 private:
+    //куча приватных переменных и методов(но их надо дополнять и как-то сортировать)
     QToolBar *createToolbar();
     QToolBar *toolbar;
     QVector<QString> *poeshGovna;
@@ -25,10 +26,12 @@ private:
     void setupLayout();
     void readTextFromFuckingFile(QString filename);
 public:
+    //Публичная вещь, конструктор и деструктор
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
 
 public slots:
+    //Те самые слоты, которые нужны для action в этом случае публичные
     void placeHeader();
     void placeText();
     void placeImage();
@@ -41,6 +44,7 @@ public slots:
     void placeHR();
     void increaseSize();
 protected:
+    //Надо в private перенести
     void toolbarToLeft();
 };
 #endif // MAINWINDOW_H
