@@ -1,4 +1,5 @@
 //Импорты заголовочных файлов
+#include "constans.h"
 #include "PTextEdit.h"
 #include "mainwindow.h"
 // Импорты библиотек Qt
@@ -121,7 +122,7 @@ void MainWindow::placeHeader() {
     //Если что-то выделено - то...
     if (textCursor.hasSelection()) {
         //Заместо курсора пихается html код в данном случае текст становится заголовком
-        textCursor.insertHtml("<center><h1>" + textCursor.selectedText() + "</h1>" + "<p>" + "</p>"+"</center>");
+        textCursor.insertHtml(CENTER_OPEN + HEADER_OPEN + textCursor.selectedText() + HEADER_CLOSE + PARAGRAPH_OPEN + PARAGRAPH_CLOSE + CENTER_CLOSE);
     }
 }
 //Костыльная функция которую надо передлать/убрать, она отвечает за возвращение текста к исходному состоянию, работает правильно, но по идее не должна
@@ -138,34 +139,34 @@ void MainWindow::placeImage() {
     //Создаётся диалоговое окно с выбором файла(только png(тоже надо переделать)), дальше когда пользователь выбирает картинку программа получает полный путь до неё
     imageSrc = QFileDialog::getOpenFileName(this, "Fuck", "", "*.png");
     //Ну это я решил удариться в правильно написание и строки в отдельную переменную по хорошему так везде надо сделать, здсь через html теги добавляется картинки
-    htmlImage = this->textEdit->toHtml() + "<p></p>" + "<center>" +  "<img src =" + imageSrc + ">" + "</img>" + "</center>";
+    htmlImage = this->textEdit->toHtml() + PARAGRAPH_OPEN + PARAGRAPH_CLOSE + CENTER_OPEN +  IMG_OPEN + imageSrc + TAG_CLOSE + IMG_CLOSE + CENTER_CLOSE;
     this->textEdit->setHtml(htmlImage);
 }
 //Работает так же как и placeHeader, только делает курсив
 void MainWindow::placeCurs() {
     QTextCursor textCursor = this->textEdit->textCursor();
     if(textCursor.hasSelection()) {
-        textCursor.insertHtml("<i>" + textCursor.selectedText() + "</i>");
+        textCursor.insertHtml(CURS_OPEN + textCursor.selectedText() + CURS_CLOSE);
     }
 }
 //Работает так же как и placeHeader, только делает жирный тектс
 void MainWindow::placeBold() {
     QTextCursor textCursor = this->textEdit->textCursor();
     if(textCursor.hasSelection()) {
-        textCursor.insertHtml("<b>" + textCursor.selectedText() + "</b>");
+        textCursor.insertHtml(BOLD_OPEN + textCursor.selectedText() + BOLD_CLOSE);
     }
 }
 //Не работает, надо переделать или починить
 void MainWindow::placeStrike() {
     QTextCursor textCursor = this->textEdit->textCursor();
     if(textCursor.hasSelection()){
-        textCursor.insertHtml("<strike>" + textCursor.selectedText() + "</strike>");
+        textCursor.insertHtml("<s>" + textCursor.selectedText() + "</s>");
     }
 }
 //работает так же как и placeHeader, только делает полосу(проще увидеть что это чем понять)
 void MainWindow::placeHR() {
     QTextCursor textCursor = this->textEdit->textCursor();
-    textCursor.insertHtml("<hr>" + textCursor.selectedText() + "</hr>");
+    textCursor.insertHtml(UNDERLINE_OPEN + textCursor.selectedText() + UNDERLINE_CLOSE);
 }
 //Функция которая пихает текст в textedit(на экран его выводит)
 void MainWindow::placeText() {
@@ -200,7 +201,7 @@ bool PTextEdit::event(QEvent *event) {
             //Если строка совпадает с нужной мне(потом надо будет переписать в отдельную функцию, потому что строк будет много)
             if(cursor.selectedText() == "Lorem ipsum") {
             //Собственно показывается текст
-             QToolTip::showText(helpEvent->globalPos(), QString("Jopa"));
+             QToolTip::showText(helpEvent->globalPos(), QString(cursor.selectedText()));
             }
         }
         } else {
