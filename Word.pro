@@ -20,6 +20,7 @@ SOURCES += \
     mainwindow.cpp
 
 HEADERS += \
+    constans.h \
     mainwindow.h
 
 # Default rules for deployment.
