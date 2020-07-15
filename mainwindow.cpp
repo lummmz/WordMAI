@@ -1,4 +1,5 @@
 //Импорты заголовочных файлов
+#include "PTextEdit.h"
 #include "mainwindow.h"
 // Импорты библиотек Qt
 #include <QVBoxLayout>
@@ -6,6 +7,7 @@
 #include <QDebug>
 #include <QFileDialog>
 #include <QVector>
+#include <QToolTip>
 //Конструктор класса MainWindow(объявлен в mainwindow.h)
 //TODO: вынести большую част в TODO:
 MainWindow::MainWindow(QWidget *parent)
@@ -18,7 +20,7 @@ MainWindow::MainWindow(QWidget *parent)
     //Ещё одна функция которой здесь не должно быть, потому что её надо вынести в ui, она отвечает за установку главного layout(разметки) на окно
     setupLayout();
     //Массив(динамический(не имеет чётких границ, т.е размерность меняется по ходу выполнения программы)) название которого надо поменять, но для этого надо найти все его использования, он нужен для хранения строк при чтении из файла
-    poeshGovna = new QVector<QString>();
+    fileText = new QVector<QString>();
 }
 //Деструктор, тоже надо написать
 MainWindow::~MainWindow(){ delete pushButton;  };
@@ -37,8 +39,8 @@ QToolBar *MainWindow::createToolbar() {
     //Ниже под действиями я обозначаю QAction
     this->toolbar = new QToolBar();
     //Весь блок содержащий в себе QAction, т.е с 38 по 48 строчку отвечает за создние *действия* для тулбара, в качестве аргумента передаётся строка в которой указано имя действие(название которое должно показаться) и указатель на текущи объект(снова this)
-    QAction *quitAction = new QAction("&Open File",this);
-    QAction *setTextAction = new QAction("&Read Text from file", this);
+    QAction *quitAction = new QAction("Open File",this);
+    QAction *setTextAction = new QAction("Read Text from file", this);
     QAction *addImage = new QAction("Add Image", this);
     QAction *makeHeader = new QAction("Create Header", this);
     QAction *normalizeText = new QAction("Normalize", this);
@@ -78,7 +80,7 @@ QToolBar *MainWindow::createToolbar() {
 void MainWindow::printCheck() {
     QString fileName;
     fileName = QFileDialog::getOpenFileName(this,"Fuck", "", "*.txt") ;
-    this->readTextFromFuckingFile(fileName);
+    this->readTextFromFile(fileName);
 }
 //Функция которая отвечает за возможность редактирования текста(TextEdit, это ниже объявлено//Функция которая отвечает за возможность редактирования текста(TextEdit, это ниже объявлено), название тоже надо поменять
 void MainWindow::liveEdit() {
@@ -93,7 +95,7 @@ void MainWindow::liveEdit() {
     //Это всё нужно, чтобы когда мы тыкаем на кнопку, у нас textedit менял своё состояние в зависимости от текущего состояния(если можно редактировать, то он запрещает и наоборот)
 }
 //Очередная функция название которой надо поменять она отвечает за чтение строк из файла
-void MainWindow::readTextFromFuckingFile(QString fileName) {
+void MainWindow::readTextFromFile(QString fileName) {
     //дебаг, типо cout(print()) но в qt
     qDebug() << fileName;
     //Создание объекта класса file, которому передаётся имя файла
@@ -107,7 +109,7 @@ void MainWindow::readTextFromFuckingFile(QString fileName) {
     //Пока поток не дошёл до конца(обычный цикл while)
     while(!instream.atEnd()) {
         //В массив добавляется строчки, прочитанные из файла
-        this->poeshGovna->push_back(instream.readLine());
+        this->fileText->push_back(instream.readLine());
         //На всякий случай в консоль вывожу, обязательно убрать в релизе
         qDebug() << instream.readLine();
     }
@@ -168,13 +170,14 @@ void MainWindow::placeHR() {
 //Функция которая пихает текст в textedit(на экран его выводит)
 void MainWindow::placeText() {
     //Цикл по массиву, как и везде
-    for(int i = 0; i < this->poeshGovna->size(); i++) {
+    for(int i = 0; i < this->fileText->size(); i++) {
         //Вот это бред какой-то, оно короче не так должно работать, но я сделал так. Во временную переменную сохраняется строка, содержащая в себе строку текста
-        QString line = this->poeshGovna->value(i);
+        //Не ну красный текст надо убрать конечно
+        QString line = "<font color=\"red\">" + this->fileText->value(i) + "</font>";
         //Выводится в консоль в релизе не должно быть
         qDebug() << line;
         //Само добавление строки
-        this->textEdit->append(line);
+        this->textEdit->insertHtml(line);
     }
 }
 //Увеличение размера текста(ЛЮТЫЙ КОСТЫЛЬ, ПРОСТО СРОЧНО УБИРАТЬ)
@@ -184,6 +187,38 @@ void MainWindow::increaseSize() {
     this->textEdit->setFontPointSize(14);
     this->textEdit->setTextCursor(cursor);
 }
+//вообще жесть короче, я переопределяю функцию event
+bool PTextEdit::event(QEvent *event) {
+    if(event->type() == QEvent::ToolTip) {
+        //Конвертация вспомогательного ивента к обычному ивенту(нашёл на стаке)
+        QHelpEvent *helpEvent = static_cast<QHelpEvent*>(event);
+        //Курсор для текста
+        QTextCursor cursor = textCursor();
+        //А вот это убрать надо в релизе
+        qDebug() << cursor.selectedText();
+        if(!cursor.selectedText().isEmpty()) {
+            //Если строка совпадает с нужной мне(потом надо будет переписать в отдельную функцию, потому что строк будет много)
+            if(cursor.selectedText() == "Lorem ipsum") {
+            //Собственно показывается текст
+             QToolTip::showText(helpEvent->globalPos(), QString("Jopa"));
+            }
+        }
+        } else {
+            QToolTip::hideText();
+        }
+    return true;
+}
+PTextEdit::PTextEdit(QWidget *parent):QTextEdit(parent) {
+    //обычный конструктор, в котором я включаю отслеживание мышки
+    setMouseTracking(true);
+}
+
+void MainWindow::findString(QString string) {
+    for(int i = 0; i < fileText->size(); i++) {
+        //ненавижу это
+    }
+}
+
 //Создание layout(разметки)
 void MainWindow::setupLayout() {
     //UI!=ФАЙЛ .ui
@@ -191,7 +226,7 @@ void MainWindow::setupLayout() {
     //Создаётся виджет
     QWidget *central = new QWidget();
     //Создаётся TextEdit(поле для редактирования текста)
-    textEdit = new QTextEdit();
+    textEdit = new PTextEdit();
     //Делается чтобы нельзя было редактировать
     this->textEdit->setReadOnly(true);
     //Создаётся разметка, тоже this лишнее

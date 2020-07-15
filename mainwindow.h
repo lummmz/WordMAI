@@ -1,8 +1,11 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
+#include "PTextEdit.h"
+
 #include <QLabel>
 #include <QMainWindow>
+#include <QPlainTextEdit>
 #include <QPushButton>
 #include <QTextEdit>
 #include <QToolBar>
@@ -17,14 +20,15 @@ private:
     //куча приватных переменных и методов(но их надо дополнять и как-то сортировать)
     QToolBar *createToolbar();
     QToolBar *toolbar;
-    QVector<QString> *poeshGovna;
+    QVector<QString> *fileText;
     QVBoxLayout *layout;
     QPushButton *pushButton;
-    QTextEdit *textEdit;
+    PTextEdit *textEdit;
     QLabel *TextLabel;
 
     void setupLayout();
-    void readTextFromFuckingFile(QString filename);
+    void readTextFromFile(QString filename);
+    void findString(QString string);
 public:
     //Публичная вещь, конструктор и деструктор
     MainWindow(QWidget *parent = nullptr);
