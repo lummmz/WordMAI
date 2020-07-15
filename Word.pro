@@ -20,7 +20,7 @@ SOURCES += \
     mainwindow.cpp
 
 HEADERS += \
-    constans.h \
+    PTextEdit.h \
     mainwindow.h
 
 # Default rules for deployment.
