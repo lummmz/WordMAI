@@ -14,14 +14,18 @@
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
 {
+    model = new QDirModel();
+    view = new QTreeView();
+    view->setModel(model);
     //в функцию отвечающей за добавление tollbar(менюха слева), передаётся результат функции creaеteToolbar(), которым является объект класса QToolbar(на самом деле указатель на объект, но это не столь важно)
     addToolBar(createToolbar());
     //Функция отвечающая за перемещение toolbar с верхней части окна в левую(надо вынести вот это в layout файлы(сделать адекватный дизайн программы))
-    toolbarToLeft();
+    //toolbarToLeft();
     //Ещё одна функция которой здесь не должно быть, потому что её надо вынести в ui, она отвечает за установку главного layout(разметки) на окно
     setupLayout();
     //Массив(динамический(не имеет чётких границ, т.е размерность меняется по ходу выполнения программы)) название которого надо поменять, но для этого надо найти все его использования, он нужен для хранения строк при чтении из файла
     fileText = new QVector<QString>();
+
 }
 //Деструктор, тоже надо написать
 MainWindow::~MainWindow(){ delete pushButton;  };
@@ -231,8 +235,10 @@ void MainWindow::setupLayout() {
     //Делается чтобы нельзя было редактировать
     this->textEdit->setReadOnly(true);
     //Создаётся разметка, тоже this лишнее
-    this->layout = new QVBoxLayout();
+    this->layout = new QHBoxLayout();
+    this->textEdit->setStyleSheet(QString(Q_STATIC_TYPE));
     //На разметку добавляется виджет
+    this->layout->addWidget(this->view);
     this->layout->addWidget(this->textEdit);
     //На другой виджет добавляется разметка
     /*Схема такая(дерево)

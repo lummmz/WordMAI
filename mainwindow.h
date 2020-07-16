@@ -3,12 +3,15 @@
 
 #include "PTextEdit.h"
 
+#include <QDirModel>
+#include <QFileSystemModel>
 #include <QLabel>
 #include <QMainWindow>
 #include <QPlainTextEdit>
 #include <QPushButton>
 #include <QTextEdit>
 #include <QToolBar>
+#include <QTreeView>
 #include <QVBoxLayout>
 #include <QVector>
 
@@ -21,10 +24,12 @@ private:
     QToolBar *createToolbar();
     QToolBar *toolbar;
     QVector<QString> *fileText;
-    QVBoxLayout *layout;
+    QHBoxLayout *layout;
     QPushButton *pushButton;
     PTextEdit *textEdit;
     QLabel *TextLabel;
+    QDirModel *model;
+    QTreeView *view;
 
     void setupLayout();
     void readTextFromFile(QString filename);
