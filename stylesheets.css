@@ -1,0 +1,69 @@
+/* фон для всего окна*/
+QMainWindow {
+        background-color:rgb(176,176,176);
+}
+
+QTextEdit {
+        border-width: 1px;
+        border-style: solid;
+        background-color: rgb(255,255,255);
+        color: rgb(90,90,90);
+}
+
+
+QToolBar {
+     background: rgb(219,219,219);
+     spacing: 1px;   /* интервал между элементами в панели инструментов */
+     padding: 5px;
+}
+
+QToolButton {
+
+        border-style: solid;        /* стиль рамки */
+        color: rgb(0,0,0);      /* цыет шрифта*/
+        padding: 5px;
+        background-color: rgb(219,219,219);
+}
+
+/* при наведении мыши на элемент*/
+QToolButton:hover{
+        border-style: solid;
+        color: rgb(0,0,0);
+        padding: 5px;
+        background-color: rgb(184,184,184);
+}
+/* при нажатии на элемент с помощью мыши*/
+QToolButton:pressed{
+        border-style: solid;
+        color: rgb(0,0,0);
+        padding: 5px;
+        background-color: rgb(142,142,142);
+}
+
+
+QTreeView {
+        border-width: 1px;
+        border-style: solid;
+        background-color: rgb(255,255,255);
+        color: rgb(90,90,90);
+}
+
+QTreeView::item:hover {
+     background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 #e7effd, stop: 1 rgb(240,240,240));
+     border: 1px solid #bfcde4;
+
+ }
+
+ QTreeView::item:selected {
+      background: rgb(212,220,236);
+      color: rgb(0,0,0);
+ }
+
+ QTreeView::item:selected:active{
+     background:rgb(212,220,236);
+     color: rgb(0,0,0);
+ }с
+
+QTreeView::branch:!has-children:!has-siblings:adjoins-item {
+     border-image: url(branch-end.png) 0;
+ }
