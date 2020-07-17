@@ -24,8 +24,8 @@ SOURCES += \
 HEADERS += \
     PTextEdit.h \
     algorithmwindow.h \
+    constants.h \
     mainwindow.h \
-    constans.h \
     stylesheets.h
 
 # Default rules for deployment.

@@ -52,6 +52,7 @@ public slots:
     void placeStrike();
     void placeHR();
     void increaseSize();
+    void SaveFile();
 protected:
     //Надо в private перенести
     void toolbarToLeft();

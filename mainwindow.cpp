@@ -1,7 +1,8 @@
 //Импорты заголовочных файлов
-#include "constans.h"
+#include "constants.h"
 #include "PTextEdit.h"
 #include "mainwindow.h"
+#include "PTextEdit.h"
 // Импорты библиотек Qt
 #include <QVBoxLayout>
 #include <QAction>
@@ -9,6 +10,7 @@
 #include <QFileDialog>
 #include <QVector>
 #include <QToolTip>
+#include <QMessageBox>
 //Конструктор класса MainWindow(объявлен в mainwindow.h)
 //TODO: вынести большую част в TODO:
 MainWindow::MainWindow(QWidget *parent)
@@ -68,7 +70,7 @@ QToolBar *MainWindow::createToolbar() {
     connect(strikeText, SIGNAL(triggered()), SLOT(placeStrike()));
     connect(makeHR, SIGNAL(triggered()), SLOT(placeHR()));
     connect(increaseFont, SIGNAL(triggered()), SLOT(increaseSize()));
-    connect(saveFile, SIGNAL(triggered()), SLOT(this->textEdit->saveFile));
+    connect(saveFile, SIGNAL(triggered()), SLOT(PTextEdit::saveFile()));
     //Ниже идёт блок, который отвечает за добавление созданных действий на тулбар, тут всё просто, передаём функции действия
     this->toolbar->addAction(quitAction);
     this->toolbar->addAction(setTextAction);
@@ -103,6 +105,18 @@ void MainWindow::liveEdit() {
     //Это всё нужно, чтобы когда мы тыкаем на кнопку, у нас textedit менял своё состояние в зависимости от текущего состояния(если можно редактировать, то он запрещает и наоборот)
 }
 
+void MainWindow::SaveFile()
+{
+    QFile file ("DownloadUsersFile.txt");
+    file.remove();
+    if (!file.open(QFile::WriteOnly | QFile::Text | QFile::ReadWrite)){
+        QMessageBox::information(this,"Error", "Path not correct!");
+        return;
+    }
+    QTextStream stream (&file);
+    stream << this->textEdit->toHtml();
+    file.close();
+}
 
 //Очередная функция название которой надо поменять она отвечает за чтение строк из файла
 void MainWindow::readTextFromFile(QString fileName) {
@@ -183,7 +197,7 @@ void MainWindow::placeText() {
     for(int i = 0; i < this->fileText->size(); i++) {
         //Вот это бред какой-то, оно короче не так должно работать, но я сделал так. Во временную переменную сохраняется строка, содержащая в себе строку текста
         //Не ну красный текст надо убрать конечно
-        QString line = "<font color=\"red\">" + this->fileText->value(i) + "</font>";
+        QString line = this->fileText->value(i);
         //Выводится в консоль в релизе не должно быть
         qDebug() << line;
         //Само добавление строки
@@ -217,11 +231,6 @@ bool PTextEdit::event(QEvent *event) {
             QToolTip::hideText();
         }
     return true;
-}
-void MainWindow::findString(QString string) {
-    for(int i = 0; i < fileText->size(); i++) {
-        //ненавижу это
-    }
 }
 
 //Создание layout(разметки)
