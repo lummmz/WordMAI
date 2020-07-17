@@ -55,6 +55,7 @@ QToolBar *MainWindow::createToolbar() {
     QAction *strikeText = new QAction("Strike", this);
     QAction *makeHR = new QAction("HR", this);
     QAction *increaseFont = new QAction("+", this);
+    QAction *saveFile = new QAction("Save", this);
     //Ниже идёт блок(50-60 строки) отвечающий за добавление логики к действиям(что будет происходить когда на кнопку тыкнешь), в качестве аргументов передаётся действие, они объявлены выше, потом передаётся SIGNALS(сигналы(какое конкретно действие должно произойти, чтобы кнопка сработала)), и SLOTS(слоты(что должно произойти(сам пока не очень разобрался как работает, может есть реализация получше моей))
     connect(addImage, SIGNAL(triggered()), SLOT(placeImage()));
     connect(quitAction, SIGNAL(triggered()), SLOT(printCheck()));
@@ -67,6 +68,7 @@ QToolBar *MainWindow::createToolbar() {
     connect(strikeText, SIGNAL(triggered()), SLOT(placeStrike()));
     connect(makeHR, SIGNAL(triggered()), SLOT(placeHR()));
     connect(increaseFont, SIGNAL(triggered()), SLOT(increaseSize()));
+    connect(saveFile, SIGNAL(triggered()), SLOT(this->textEdit->saveFile));
     //Ниже идёт блок, который отвечает за добавление созданных действий на тулбар, тут всё просто, передаём функции действия
     this->toolbar->addAction(quitAction);
     this->toolbar->addAction(setTextAction);
@@ -79,6 +81,7 @@ QToolBar *MainWindow::createToolbar() {
     this->toolbar->addAction(strikeText);
     this->toolbar->addAction(makeHR);
     this->toolbar->addAction(increaseFont);
+    this->toolbar->addAction(saveFile);
     return toolbar;
 }
 //Бесплолезная функция которую можно удалять
@@ -99,6 +102,8 @@ void MainWindow::liveEdit() {
     }
     //Это всё нужно, чтобы когда мы тыкаем на кнопку, у нас textedit менял своё состояние в зависимости от текущего состояния(если можно редактировать, то он запрещает и наоборот)
 }
+
+
 //Очередная функция название которой надо поменять она отвечает за чтение строк из файла
 void MainWindow::readTextFromFile(QString fileName) {
     //дебаг, типо cout(print()) но в qt
@@ -213,11 +218,6 @@ bool PTextEdit::event(QEvent *event) {
         }
     return true;
 }
-PTextEdit::PTextEdit(QWidget *parent):QTextEdit(parent) {
-    //обычный конструктор, в котором я включаю отслеживание мышки
-    setMouseTracking(true);
-}
-
 void MainWindow::findString(QString string) {
     for(int i = 0; i < fileText->size(); i++) {
         //ненавижу это
