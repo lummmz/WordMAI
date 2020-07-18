@@ -1,0 +1,15 @@
+<RCC>
+    <qresource prefix="/img">
+        <file>Resources/img/049-underline.png</file>
+        <file>Resources/img/047-text.png</file>
+        <file>Resources/img/036-paragraph.png</file>
+        <file>Resources/img/020-italic.png</file>
+        <file>Resources/img/019-font.png</file>
+        <file>Resources/img/015-arrow.png</file>
+        <file>Resources/img/014-edit.png</file>
+        <file>Resources/img/010-file.png</file>
+        <file>Resources/img/007-clear format.png</file>
+        <file>Resources/img/005-bold.png</file>
+        <file>Resources/img/save-file-option.png</file>
+    </qresource>
+</RCC>

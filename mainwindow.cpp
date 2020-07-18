@@ -16,9 +16,18 @@
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
 {
-    model = new QDirModel();
+    model = new QFileSystemModel();
+    QStringList filters;
+    filters.append("*.lect");
+    filters.append("*.txt");
     view = new QTreeView();
+    model->setRootPath(QDir::currentPath());
+    model->setNameFilters(filters);
     view->setModel(model);
+    view->hideColumn(1);
+    view->hideColumn(2);
+    view->setColumnWidth(0, 200);
+    connect(view, SIGNAL(doubleClicked(QModelIndex)), this, SLOT(TreeViewDoubleClick(QModelIndex)));
     //в функцию отвечающей за добавление tollbar(менюха слева), передаётся результат функции creaеteToolbar(), которым является объект класса QToolbar(на самом деле указатель на объект, но это не столь важно)
     addToolBar(createToolbar());
     //Функция отвечающая за перемещение toolbar с верхней части окна в левую(надо вынести вот это в layout файлы(сделать адекватный дизайн программы))
@@ -31,6 +40,11 @@ MainWindow::MainWindow(QWidget *parent)
 }
 //Деструктор, тоже надо написать
 MainWindow::~MainWindow(){ delete pushButton;  };
+
+void MainWindow::TreeViewDoubleClick(const QModelIndex& index) {
+    auto path = model->filePath(index);
+    readTextFromFile(path);
+}
 //Функция переносящая toolbar в левую часть, потому что я решил что так солиднее, но возможно это бред
 void MainWindow::toolbarToLeft() {
     //Функция отвечающая за удаление toolbar с верхней части окна
@@ -46,18 +60,27 @@ QToolBar *MainWindow::createToolbar() {
     //Ниже под действиями я обозначаю QAction
     this->toolbar = new QToolBar();
     //Весь блок содержащий в себе QAction, т.е с 38 по 48 строчку отвечает за создние *действия* для тулбара, в качестве аргумента передаётся строка в которой указано имя действие(название которое должно показаться) и указатель на текущи объект(снова this)
-    QAction *quitAction = new QAction("Open File",this);
+    const QIcon openIcon = QIcon::fromTheme("document-open", QIcon(":img/Resources/img/010-file.png"));
+    const QIcon imgIcon = QIcon::fromTheme("document-open", QIcon(":img/Resources/img/015-arrow.png"));
+    const QIcon boldIcon = QIcon::fromTheme("document-open", QIcon(":img/Resources/img/005-bold.png"));
+    const QIcon editIcon = QIcon::fromTheme("document-open", QIcon(":img/Resources/img/014-edit.png"));
+    const QIcon curIcon = QIcon::fromTheme("document-open", QIcon(":img/Resources/img/020-italic.png"));
+    const QIcon headIcon = QIcon::fromTheme("document-open", QIcon(":img/Resources/img/036-paragraph.png"));
+    const QIcon underlineIcon = QIcon::fromTheme("document-open", QIcon(":img/Resources/img/049-underline.png"));
+    const QIcon normalIcon = QIcon::fromTheme("document-open", QIcon(":img/Resources/img/007-clear format.png"));
+    const QIcon saveIcon = QIcon::fromTheme("document-open", QIcon(":img/Resources/img/save-file-option.png"));
+    QAction *quitAction = new QAction(openIcon,"Open File",this);
     QAction *setTextAction = new QAction("Read Text from file", this);
-    QAction *addImage = new QAction("Add Image", this);
-    QAction *makeHeader = new QAction("Create Header", this);
-    QAction *normalizeText = new QAction("Normalize", this);
-    QAction *liveEditMode = new QAction("Live Edit", this);
-    QAction *cursiveText = new QAction("Cursive", this);
-    QAction *boldText = new QAction("Bold", this);
+    QAction *addImage = new QAction(imgIcon, "Add Image", this);
+    QAction *makeHeader = new QAction(headIcon, "Create Header", this);
+    QAction *normalizeText = new QAction(normalIcon, "Normalize", this);
+    QAction *liveEditMode = new QAction(editIcon, "Live Edit", this);
+    QAction *cursiveText = new QAction(curIcon, "Cursive", this);
+    QAction *boldText = new QAction(boldIcon, "Bold", this);
     QAction *strikeText = new QAction("Strike", this);
-    QAction *makeHR = new QAction("HR", this);
+    QAction *makeHR = new QAction(underlineIcon, "HR", this);
     QAction *increaseFont = new QAction("+", this);
-    QAction *saveFile = new QAction("Save", this);
+    QAction *saveFile = new QAction(saveIcon,"Save", this);
     //Ниже идёт блок(50-60 строки) отвечающий за добавление логики к действиям(что будет происходить когда на кнопку тыкнешь), в качестве аргументов передаётся действие, они объявлены выше, потом передаётся SIGNALS(сигналы(какое конкретно действие должно произойти, чтобы кнопка сработала)), и SLOTS(слоты(что должно произойти(сам пока не очень разобрался как работает, может есть реализация получше моей))
     connect(addImage, SIGNAL(triggered()), SLOT(placeImage()));
     connect(quitAction, SIGNAL(triggered()), SLOT(printCheck()));
@@ -70,35 +93,35 @@ QToolBar *MainWindow::createToolbar() {
     connect(strikeText, SIGNAL(triggered()), SLOT(placeStrike()));
     connect(makeHR, SIGNAL(triggered()), SLOT(placeHR()));
     connect(increaseFont, SIGNAL(triggered()), SLOT(increaseSize()));
-    connect(saveFile, SIGNAL(triggered()), SLOT(PTextEdit::saveFile()));
+    connect(saveFile, SIGNAL(triggered()), SLOT(SaveFile()));
     //Ниже идёт блок, который отвечает за добавление созданных действий на тулбар, тут всё просто, передаём функции действия
     this->toolbar->addAction(quitAction);
-    this->toolbar->addAction(setTextAction);
     this->toolbar->addAction(addImage);
     this->toolbar->addAction(makeHeader);
     this->toolbar->addAction(normalizeText);
     this->toolbar->addAction(liveEditMode);
     this->toolbar->addAction(cursiveText);
     this->toolbar->addAction(boldText);
-    this->toolbar->addAction(strikeText);
     this->toolbar->addAction(makeHR);
-    this->toolbar->addAction(increaseFont);
     this->toolbar->addAction(saveFile);
     return toolbar;
 }
 //Бесплолезная функция которую можно удалять
 void MainWindow::printCheck() {
     QString fileName;
-    fileName = QFileDialog::getOpenFileName(this,"Fuck", "", "*.txt") ;
+    fileName = QFileDialog::getOpenFileName(this,"", "", "*.txt") ;
     this->readTextFromFile(fileName);
 }
 //Функция которая отвечает за возможность редактирования текста(TextEdit, это ниже объявлено//Функция которая отвечает за возможность редактирования текста(TextEdit, это ниже объявлено), название тоже надо поменять
 void MainWindow::liveEdit() {
+    qDebug() << "Живовй";
     //Проверка можно ли редактировать текст сейчас
     if(this->textEdit->isReadOnly()) {
+        qDebug() << "Test";
         //если да, то мы передаём то что textedit больше не readonly
         this->textEdit->setReadOnly(false);
     } else {
+        qDebug() << "Test2";
         //если текст нельзя редактировать, то мы разрешаем его редактировать
         this->textEdit->setReadOnly(true);
     }
@@ -137,6 +160,7 @@ void MainWindow::readTextFromFile(QString fileName) {
         //На всякий случай в консоль вывожу, обязательно убрать в релизе
         qDebug() << instream.readLine();
     }
+    placeText();
 }
 //Дальше идут самые основные функции, они созданы чтобы редактировать текст, всё редактирование идёт через html(язык разметки, на нём сайтики делаются)
 void MainWindow::placeHeader() {
@@ -162,8 +186,10 @@ void MainWindow::placeImage() {
     //Создаётся диалоговое окно с выбором файла(только png(тоже надо переделать)), дальше когда пользователь выбирает картинку программа получает полный путь до неё
     imageSrc = QFileDialog::getOpenFileName(this, "Fuck", "", "*.png");
     //Ну это я решил удариться в правильно написание и строки в отдельную переменную по хорошему так везде надо сделать, здсь через html теги добавляется картинки
-    htmlImage = this->textEdit->toHtml() + PARAGRAPH_OPEN + PARAGRAPH_CLOSE + CENTER_OPEN +  IMG_OPEN + imageSrc + TAG_CLOSE + IMG_CLOSE + CENTER_CLOSE;
-    this->textEdit->setHtml(htmlImage);
+    if(!imageSrc.isEmpty()) {
+        htmlImage = this->textEdit->toHtml() + PARAGRAPH_OPEN + PARAGRAPH_CLOSE + CENTER_OPEN +  IMG_OPEN + imageSrc + TAG_CLOSE + IMG_CLOSE + CENTER_CLOSE;
+        this->textEdit->setHtml(htmlImage);
+    }
 }
 //Работает так же как и placeHeader, только делает курсив
 void MainWindow::placeCurs() {
@@ -247,8 +273,8 @@ void MainWindow::setupLayout() {
     this->layout = new QHBoxLayout();
     this->textEdit->setStyleSheet(QString(Q_STATIC_TYPE));
     //На разметку добавляется виджет
-    this->layout->addWidget(this->view);
-    this->layout->addWidget(this->textEdit);
+    this->layout->addWidget(this->view, 10);
+    this->layout->addWidget(this->textEdit, 30);
     //На другой виджет добавляется разметка
     /*Схема такая(дерево)
     1.Виджет(самый короче главный после окна)

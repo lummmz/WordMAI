@@ -2,6 +2,7 @@
 #define MAINWINDOW_H
 
 #include "PTextEdit.h"
+#include "PTextEdit.h"
 
 #include <QDirModel>
 #include <QFileSystemModel>
@@ -28,7 +29,7 @@ private:
     QPushButton *pushButton;
     PTextEdit *textEdit;
     QLabel *TextLabel;
-    QDirModel *model;
+    QFileSystemModel *model;
     QTreeView *view;
 
     void setupLayout();
@@ -53,6 +54,7 @@ public slots:
     void placeHR();
     void increaseSize();
     void SaveFile();
+    void TreeViewDoubleClick(const QModelIndex &index);
 protected:
     //Надо в private перенести
     void toolbarToLeft();

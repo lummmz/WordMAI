@@ -14,8 +14,8 @@ public:
     PTextEdit(QWidget *parent = nullptr);
 
     bool event(QEvent *e);
-public slots:
     void saveFile();
+public slots:
 };
 
 #endif // PTEXTEDIT_H

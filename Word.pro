@@ -32,3 +32,18 @@ HEADERS += \
 qnx: target.path = /tmp/$${TARGET}/bin
 else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
+
+DISTFILES += \
+    Resources/img/005-bold.png \
+    Resources/img/007-clear format.png \
+    Resources/img/010-file.png \
+    Resources/img/014-edit.png \
+    Resources/img/015-arrow.png \
+    Resources/img/019-font.png \
+    Resources/img/020-italic.png \
+    Resources/img/036-paragraph.png \
+    Resources/img/047-text.png \
+    Resources/img/049-underline.png
+
+RESOURCES += \
+    res.qrc
